@@ -490,14 +490,15 @@ export async function userDetails(request, response) {
         });
     }
 }
-//rider togle
+
+// rider togle
 export const toggleDriverOnlineStatus = async (req, res) => {
   try {
     const driver = await UserModel.findById(req.userId);
     if (!driver) {
       return res.status(404).json({ message: "Driver not found" });
     }
-    
+
     driver.isOnline = req.body.isOnline;
     await driver.save();
 
@@ -511,7 +512,7 @@ export const toggleDriverOnlineStatus = async (req, res) => {
   }
 };
 
-//get user profile
+// get user profile
 export const getUserProfile = async (req, res) => {
   try {
     const user = await UserModel.findById(req.userId).select('-password');
@@ -520,10 +521,10 @@ export const getUserProfile = async (req, res) => {
     res.status(500).json({ message: 'Server error' });
   }
 };
-/* 
-|-------------------------------------------------------------------------- 
-| REQUEST RIDE (Add to upcoming_rides) 🚗 
-|-------------------------------------------------------------------------- 
+
+/* |--------------------------------------------------------------------------
+| REQUEST RIDE (Add to upcoming_rides) 🚗
+|--------------------------------------------------------------------------
 */
 export const requestRide = async (req, res) => {
   try {
@@ -568,10 +569,9 @@ export const requestRide = async (req, res) => {
   }
 };
 
-/* 
-|-------------------------------------------------------------------------- 
-| GET RIDE HISTORY 🚗 
-|-------------------------------------------------------------------------- 
+/* |--------------------------------------------------------------------------
+| GET RIDE HISTORY 🚗
+|--------------------------------------------------------------------------
 */
 export const getRideHistory = async (req, res) => {
   try {
@@ -595,50 +595,59 @@ export const getRideHistory = async (req, res) => {
   }
 };
 
-/* 
-|-------------------------------------------------------------------------- 
-| COMPLETE RIDE (Move from upcoming_rides -> ride_history) 🚗 
-|-------------------------------------------------------------------------- 
+/* |--------------------------------------------------------------------------
+| COMPLETE RIDE (Move from upcoming_rides -> ride_history) 🚗
+|--------------------------------------------------------------------------
 */
 export const completeRide = async (req, res) => {
   try {
-    const userId = req.userId;
-    const { rideIndex } = req.body; // pass index of the ride to complete
+    const userId = req.userId; // This is the driverId
+    const { customerId, rideIndex } = req.body; // customerId is the user who requested the ride
 
-    const user = await UserModel.findById(userId);
+    const customer = await UserModel.findById(customerId);
 
-    if (!user) {
+    if (!customer) {
       return res.status(404).json({
-        message: "User not found",
+        message: "Customer not found",
         error: true,
         success: false
       });
     }
 
     if (
-      !user.upcoming_rides ||
-      user.upcoming_rides.length === 0 ||
-      rideIndex >= user.upcoming_rides.length
+      !customer.upcoming_rides ||
+      customer.upcoming_rides.length === 0 ||
+      rideIndex >= customer.upcoming_rides.length
     ) {
       return res.status(400).json({
-        message: "Invalid ride index",
+        message: "Invalid ride index for this customer",
         error: true,
         success: false
       });
     }
 
     // Get the ride
-    const ride = user.upcoming_rides[rideIndex];
+    const ride = customer.upcoming_rides[rideIndex];
+
+    // Ensure the ride is indeed assigned to this driver and is accepted
+    if (ride.driver.toString() !== userId.toString() || ride.status !== "accepted") {
+      return res.status(403).json({
+        message: "You are not authorized to complete this ride or it's not accepted yet.",
+        error: true,
+        success: false
+      });
+    }
+
     ride.status = "completed";
     ride.completed_at = new Date();
 
     // Move to ride_history
-    user.ride_history.push(ride);
+    customer.ride_history.push(ride);
 
     // Remove from upcoming_rides
-    user.upcoming_rides.splice(rideIndex, 1);
+    customer.upcoming_rides.splice(rideIndex, 1);
 
-    await user.save();
+    await customer.save();
 
     return res.json({
       message: "Ride completed successfully",
@@ -655,10 +664,9 @@ export const completeRide = async (req, res) => {
   }
 };
 
-/* 
-|-------------------------------------------------------------------------- 
-| DRIVER FETCH PENDING RIDES 🚗 
-|-------------------------------------------------------------------------- 
+/* |--------------------------------------------------------------------------
+| DRIVER FETCH PENDING RIDES 🚗
+|--------------------------------------------------------------------------
 */
 export const getPendingRides = async (req, res) => {
   try {
@@ -689,28 +697,55 @@ export const getPendingRides = async (req, res) => {
       });
     }
 
-    // 2️⃣ Fetch pending rides (without aggregation)
+    // 2️⃣ Check if driver has current location
+    if (!driver.current_location || !driver.current_location.lat) {
+      return res.status(400).json({
+        message: "Please enable location services to see nearby rides",
+        error: true,
+        success: false,
+      });
+    }
+
+    // 3️⃣ Fetch pending rides within 5km radius (adjust as needed)
     const users = await UserModel.find({
       "upcoming_rides.status": "requested",
       "upcoming_rides.driver": null,
     });
 
     const pendingRides = [];
+    const driverLat = driver.current_location.lat;
+    const driverLng = driver.current_location.lng;
 
     users.forEach((user) => {
       user.upcoming_rides.forEach((ride, index) => {
         if (ride.status === "requested" && ride.driver === null) {
-          pendingRides.push({
-            userId: user._id,
-            rideIndex: index,
-            pickup_location: ride.pickup_location,
-            dropoff_location: ride.dropoff_location,
-            fare: ride.fare,
-            requested_at: ride.requested_at,
-          });
+          // Calculate distance between driver and pickup point
+          const distance = calculateDistance(
+            driverLat,
+            driverLng,
+            ride.pickup_location.lat,
+            ride.pickup_location.lng
+          );
+
+          // Only include rides within 5km radius (adjust as needed)
+          if (distance <= 5) {
+            pendingRides.push({
+              userId: user._id, // IMPORTANT: Include userId
+              rideIndex: index, // IMPORTANT: Include rideIndex
+              pickup_location: ride.pickup_location,
+              dropoff_location: ride.dropoff_location,
+              fare: ride.fare,
+              vehicle_type: ride.vehicle_type,
+              requested_at: ride.requested_at,
+              distance: distance.toFixed(2) + " km"
+            });
+          }
         }
       });
     });
+
+    // Sort by distance (nearest first)
+    pendingRides.sort((a, b) => parseFloat(a.distance) - parseFloat(b.distance));
 
     res.json({
       message: "Pending rides fetched",
@@ -728,16 +763,106 @@ export const getPendingRides = async (req, res) => {
   }
 };
 
+/* |--------------------------------------------------------------------------
+| DRIVER FETCH ACCEPTED RIDES 🚗
+|--------------------------------------------------------------------------
+*/
+export const getAcceptedRides = async (req, res) => {
+  try {
+    const driverId = req.userId;
 
-/* 
-|-------------------------------------------------------------------------- 
-| DRIVER ACCEPT RIDE 🚗 
-|-------------------------------------------------------------------------- 
+    const driver = await UserModel.findById(driverId);
+    if (!driver || driver.role !== "driver") {
+      return res.status(403).json({
+        message: "Access denied. Only drivers can view accepted rides.",
+        error: true,
+        success: false,
+      });
+    }
+
+    // Find rides where this driver is assigned and the status is 'accepted'
+    // This requires iterating through all users' upcoming_rides
+    const usersWithAcceptedRides = await UserModel.find({
+      "upcoming_rides.driver": driverId,
+      "upcoming_rides.status": "accepted",
+    });
+
+    const acceptedRides = [];
+    usersWithAcceptedRides.forEach(user => {
+      user.upcoming_rides.forEach((ride, index) => {
+        if (ride.driver && ride.driver.toString() === driverId.toString() && ride.status === "accepted") {
+          acceptedRides.push({
+            userId: user._id, // Include userId for completing the ride later
+            rideIndex: index, // Include rideIndex
+            ...ride.toObject(), // Convert Mongoose subdocument to plain object
+          });
+        }
+      });
+    });
+
+    res.json({
+      message: "Accepted rides fetched successfully",
+      error: false,
+      success: true,
+      data: acceptedRides,
+    });
+  } catch (error) {
+    console.error("🔥 Get Accepted Rides Error:", error);
+    res.status(500).json({
+      message: error.message || error,
+      error: true,
+      success: false,
+    });
+  }
+};
+
+// Helper function to calculate distance between two coordinates
+function calculateDistance(lat1, lon1, lat2, lon2) {
+  const R = 6371; // Radius of the earth in km
+  const dLat = (lat2 - lat1) * (Math.PI / 180);
+  const dLon = (lon2 - lon1) * (Math.PI / 180);
+  const a =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos((lat1 * Math.PI) / 180) *
+    Math.cos((lat2 * Math.PI) / 180) *
+    Math.sin(dLon / 2) *
+    Math.sin(dLon / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  return R * c; // Distance in km
+}
+
+// updatedriverlocation
+export const updateDriverLocation = async (req, res) => {
+  try {
+    const { lat, lng } = req.body;
+
+    await UserModel.findByIdAndUpdate(req.userId, {
+      current_location: { lat, lng }
+    });
+
+    res.json({
+      message: "Location updated successfully",
+      error: false,
+      success: true
+    });
+  } catch (error) {
+    console.error("Location update error:", error);
+    res.status(500).json({
+      message: error.message || error,
+      error: true,
+      success: false
+    });
+  }
+};
+
+/* |--------------------------------------------------------------------------
+| DRIVER ACCEPT RIDE 🚗
+|--------------------------------------------------------------------------
 */
 export const acceptRide = async (req, res) => {
   try {
     const driverId = req.userId;
-    const { userId, rideIndex } = req.body;
+    const { userId, rideIndex } = req.body; // Expecting userId and rideIndex
 
     const user = await UserModel.findById(userId);
 
@@ -749,9 +874,19 @@ export const acceptRide = async (req, res) => {
       });
     }
 
+    // Check if the ride is still requested and not assigned to another driver
+    if (user.upcoming_rides[rideIndex].status !== "requested" || user.upcoming_rides[rideIndex].driver !== null) {
+      return res.status(409).json({
+        message: "Ride has already been accepted or is no longer available.",
+        error: true,
+        success: false,
+      });
+    }
+
     // Update the ride
     user.upcoming_rides[rideIndex].driver = driverId;
     user.upcoming_rides[rideIndex].status = "accepted";
+    user.upcoming_rides[rideIndex].accepted_at = new Date(); // Add accepted_at timestamp
     await user.save();
 
     res.json({
