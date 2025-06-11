@@ -14,7 +14,9 @@ import {
   getUserProfile,
   requestRide,
   getRideHistory,
-  completeRide
+  completeRide,
+  getPendingRides,
+  acceptRide
 } from '../controllers/usercontroller.js';
 import auth from '../middleware/auth.js';
 import upload from '../middleware/multer.js';
@@ -36,5 +38,9 @@ router.get('/profile', auth, getUserProfile);
 router.post('/ride/request',auth,requestRide);
 router.get('/ride/history',auth,getRideHistory);
 router.put('/ride/complete',auth,completeRide);
+// 🚗 Driver APIs
+router.get('/driver/pending-rides', auth, getPendingRides);
+router.post('/driver/accept-ride', auth, acceptRide);
+
 
 export default router;
