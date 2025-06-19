@@ -16,7 +16,10 @@ import Profile from './pages/Pro';
 import DriverHome from './pages/DriverHome';
 import UserHome from './pages/UserHome';
 import Requestr from './pages/RideRequest';
+<<<<<<< HEAD
 import chatbot from './pages/chatbot';
+=======
+>>>>>>> 6fac3ecf179c8feeb22b400ae47a38a6054aafa2
 
 function App() {
   return (
@@ -39,7 +42,10 @@ function App() {
         <Route path="/driver/home" element={<DriverHome />} />
        <Route path="/user/home" element={<UserHome />} /> 
        <Route path="/request-ride" element={<Requestr/>}/>
+<<<<<<< HEAD
        <Route path="/chatbot" element={<chatbot />}/>
+=======
+>>>>>>> 6fac3ecf179c8feeb22b400ae47a38a6054aafa2
         {/* Add other routes as needed */}
       </Routes>
     </Router>

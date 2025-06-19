@@ -25,18 +25,29 @@ const DriverHome = () => {
   const abortControllerRef = useRef(new AbortController());
   const reconnectAttemptsRef = useRef(0);
   const isMountedRef = useRef(true);
+<<<<<<< HEAD
     const handleProfileClick = () => {
     navigate("/profile");
   };
    
   // Generate unique keys for rides
+=======
+
+  // Generate truly unique keys for rides
+>>>>>>> 6fac3ecf179c8feeb22b400ae47a38a6054aafa2
   const generateUniqueKey = (userId, rideIndex) => {
     return `${userId}-${rideIndex}-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
   };
 
+<<<<<<< HEAD
   // Calculate distance between coordinates
   const calculateDistance = useCallback((lat1, lon1, lat2, lon2) => {
     const R = 6371;
+=======
+  // Helper function to calculate distance between two coordinates
+  const calculateDistance = useCallback((lat1, lon1, lat2, lon2) => {
+    const R = 6371; // Radius of the earth in km
+>>>>>>> 6fac3ecf179c8feeb22b400ae47a38a6054aafa2
     const dLat = (lat2 - lat1) * (Math.PI / 180);
     const dLon = (lon2 - lon1) * (Math.PI / 180);
     const a =
@@ -46,6 +57,7 @@ const DriverHome = () => {
       Math.sin(dLon / 2) *
       Math.sin(dLon / 2);
     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+<<<<<<< HEAD
     return R * c;
   }, []);
 
@@ -72,6 +84,15 @@ const DriverHome = () => {
   const updateDriverLocation = useCallback(async () => {
     if (!navigator.geolocation) {
       toast.error("Geolocation not supported");
+=======
+    return R * c; // Distance in km
+  }, []);
+
+  // Function to update driver's location
+  const updateDriverLocation = useCallback(async () => {
+    if (!navigator.geolocation) {
+      toast.error("Geolocation is not supported by your browser");
+>>>>>>> 6fac3ecf179c8feeb22b400ae47a38a6054aafa2
       setLocationError("Geolocation not supported");
       return;
     }
@@ -99,7 +120,11 @@ const DriverHome = () => {
           });
         }
       } catch (error) {
+<<<<<<< HEAD
         console.error("Location update error:", error);
+=======
+        console.error("Error updating location:", error);
+>>>>>>> 6fac3ecf179c8feeb22b400ae47a38a6054aafa2
         if (error.response?.status === 401) {
           toast.error("Session expired. Please login again.");
           navigate('/login');
@@ -108,7 +133,11 @@ const DriverHome = () => {
     };
 
     const handleError = (error) => {
+<<<<<<< HEAD
       console.error("Geolocation error:", error);
+=======
+      console.error("Error getting location:", error);
+>>>>>>> 6fac3ecf179c8feeb22b400ae47a38a6054aafa2
       setLocationError(error.message);
       if (!currentLocation) {
         toast.error(`Location error: ${error.message}`);
@@ -118,6 +147,7 @@ const DriverHome = () => {
     navigator.geolocation.getCurrentPosition(
       handleSuccess,
       handleError,
+<<<<<<< HEAD
       { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
     );
   }, [currentLocation, navigate]);
@@ -126,6 +156,23 @@ const DriverHome = () => {
   const setupSocket = useCallback(() => {
     if (socketRef.current?.connected) return;
 
+=======
+      {
+        enableHighAccuracy: true,
+        timeout: 10000,
+        maximumAge: 0
+      }
+    );
+  }, [currentLocation, navigate]);
+
+  // Initialize WebSocket connection with robust reconnect logic
+  const setupSocket = useCallback(() => {
+    if (socketRef.current?.connected) {
+      return;
+    }
+
+    // Clean up any existing socket
+>>>>>>> 6fac3ecf179c8feeb22b400ae47a38a6054aafa2
     if (socketRef.current) {
       socketRef.current.disconnect();
       socketRef.current = null;
@@ -137,7 +184,13 @@ const DriverHome = () => {
       reconnectionDelay: 1000,
       reconnectionDelayMax: 5000,
       randomizationFactor: 0.5,
+<<<<<<< HEAD
       auth: { token: tokenRef.current },
+=======
+      auth: {
+        token: tokenRef.current
+      },
+>>>>>>> 6fac3ecf179c8feeb22b400ae47a38a6054aafa2
       transports: ['websocket'],
       withCredentials: true
     });
@@ -155,22 +208,46 @@ const DriverHome = () => {
 
     newSocket.on('disconnect', (reason) => {
       if (!isMountedRef.current) return;
+<<<<<<< HEAD
       console.log('Disconnected:', reason);
       setSocketStatus('disconnected');
       
       if (reason === 'io server disconnect') {
         setTimeout(() => newSocket.connect(), 1000);
+=======
+      console.log('Disconnected from WebSocket:', reason);
+      setSocketStatus('disconnected');
+      
+      if (reason === 'io server disconnect') {
+        setTimeout(() => {
+          if (isMountedRef.current) {
+            newSocket.connect();
+          }
+        }, 1000);
+>>>>>>> 6fac3ecf179c8feeb22b400ae47a38a6054aafa2
       }
     });
 
     newSocket.on('connect_error', (error) => {
       if (!isMountedRef.current) return;
+<<<<<<< HEAD
       console.error('Connection error:', error);
+=======
+      console.error('WebSocket connection error:', error);
+>>>>>>> 6fac3ecf179c8feeb22b400ae47a38a6054aafa2
       setSocketStatus('error');
       reconnectAttemptsRef.current += 1;
       
       if (reconnectAttemptsRef.current <= 5) {
+<<<<<<< HEAD
         setTimeout(() => newSocket.connect(), Math.min(5000, reconnectAttemptsRef.current * 1000));
+=======
+        setTimeout(() => {
+          if (isMountedRef.current) {
+            newSocket.connect();
+          }
+        }, Math.min(5000, reconnectAttemptsRef.current * 1000));
+>>>>>>> 6fac3ecf179c8feeb22b400ae47a38a6054aafa2
       }
     });
 
@@ -187,12 +264,17 @@ const DriverHome = () => {
     };
   }, [isOnline]);
 
+<<<<<<< HEAD
   // Socket listeners
+=======
+  // Set up socket listeners
+>>>>>>> 6fac3ecf179c8feeb22b400ae47a38a6054aafa2
   useEffect(() => {
     const socket = socketRef.current;
     if (!socket) return;
 
     const handleNewRide = (newRideData) => {
+<<<<<<< HEAD
       if (!isMountedRef.current || !isOnline || !currentLocation) return;
       
       const distance = calculateDistance(
@@ -221,15 +303,48 @@ const DriverHome = () => {
           }, ...prev];
         });
         toast.info(`New ride available ${distance.toFixed(2)}km away`);
+=======
+      if (!isMountedRef.current) return;
+      if (isOnline && currentLocation) {
+        const distance = calculateDistance(
+          currentLocation.lat,
+          currentLocation.lng,
+          newRideData.pickup_location.lat,
+          newRideData.pickup_location.lng
+        );
+
+        if (distance <= 5) {
+          setPendingRides(prev => {
+            const rideExists = prev.some(ride =>
+              ride.userId === newRideData.userId && ride.rideIndex === newRideData.rideIndex
+            );
+            if (rideExists) return prev;
+
+            return [{
+              userId: newRideData.userId,
+              rideIndex: newRideData.rideIndex,
+              ...newRideData,
+              distance: distance.toFixed(2) + ' km',
+              uniqueKey: generateUniqueKey(newRideData.userId, newRideData.rideIndex)
+            }, ...prev];
+          });
+          toast.info(`New ride available ${distance.toFixed(2)}km away`);
+        }
+>>>>>>> 6fac3ecf179c8feeb22b400ae47a38a6054aafa2
       }
     };
 
     const handleRideAccepted = ({ userId, rideIndex }) => {
       if (!isMountedRef.current) return;
+<<<<<<< HEAD
       setPendingRides(prev => 
         prev.filter(r => !(r.userId === userId && r.rideIndex === rideIndex))
       );
       toast.info("Ride accepted by another driver");
+=======
+      setPendingRides(prev => prev.filter(ride => !(ride.userId === userId && ride.rideIndex === rideIndex)));
+      toast.info("A ride was accepted by another driver.");
+>>>>>>> 6fac3ecf179c8feeb22b400ae47a38a6054aafa2
     };
 
     socket.on('newRideAvailable', handleNewRide);
@@ -241,6 +356,14 @@ const DriverHome = () => {
     };
   }, [isOnline, currentLocation, calculateDistance]);
 
+<<<<<<< HEAD
+=======
+  // Custom isCancel function
+  const isCancel = (error) => {
+    return error && error.name === 'CanceledError';
+  };
+
+>>>>>>> 6fac3ecf179c8feeb22b400ae47a38a6054aafa2
   // Fetch with retry logic
   const fetchWithRetry = useCallback(async (url, options = {}, retries = 3) => {
     try {
@@ -255,7 +378,14 @@ const DriverHome = () => {
       });
       return response;
     } catch (error) {
+<<<<<<< HEAD
       if (!isMountedRef.current || isCancel(error)) throw error;
+=======
+      if (isCancel(error) || !isMountedRef.current) {
+        throw error;
+      }
+      
+>>>>>>> 6fac3ecf179c8feeb22b400ae47a38a6054aafa2
       if (retries <= 0 || error.response?.status === 401) throw error;
       
       await new Promise(res => setTimeout(res, 1000 * (4 - retries)));
@@ -263,7 +393,11 @@ const DriverHome = () => {
     }
   }, []);
 
+<<<<<<< HEAD
   // Initial setup
+=======
+  // Fetch initial driver status and setup
+>>>>>>> 6fac3ecf179c8feeb22b400ae47a38a6054aafa2
   useEffect(() => {
     isMountedRef.current = true;
     const fetchDriverProfile = async () => {
@@ -274,7 +408,13 @@ const DriverHome = () => {
         const { isOnline: initialIsOnline, current_location } = response.data;
         setIsOnline(initialIsOnline);
         
+<<<<<<< HEAD
         if (current_location) setCurrentLocation(current_location);
+=======
+        if (current_location) {
+          setCurrentLocation(current_location);
+        }
+>>>>>>> 6fac3ecf179c8feeb22b400ae47a38a6054aafa2
 
         if (initialIsOnline) {
           updateDriverLocation();
@@ -283,9 +423,18 @@ const DriverHome = () => {
         }
       } catch (error) {
         if (!isCancel(error) && isMountedRef.current) {
+<<<<<<< HEAD
           console.error("Profile fetch error:", error);
           if (error.response?.status === 401) {
             navigate('/login');
+=======
+          console.error("Error fetching driver profile:", error);
+          if (error.response?.status === 401) {
+            toast.error("Session expired. Please login again.");
+            navigate('/login');
+          } else {
+            toast.error("Failed to fetch driver profile");
+>>>>>>> 6fac3ecf179c8feeb22b400ae47a38a6054aafa2
           }
         }
       } finally {
@@ -301,9 +450,18 @@ const DriverHome = () => {
     };
   }, [updateDriverLocation, fetchWithRetry, navigate]);
 
+<<<<<<< HEAD
   // Socket setup
   useEffect(() => {
     if (isMountedRef.current) setupSocket();
+=======
+  // Initialize socket connection when component mounts and when isOnline changes
+  useEffect(() => {
+    if (isMountedRef.current) {
+      setupSocket();
+    }
+
+>>>>>>> 6fac3ecf179c8feeb22b400ae47a38a6054aafa2
     return () => {
       if (socketRef.current) {
         socketRef.current.disconnect();
@@ -312,14 +470,25 @@ const DriverHome = () => {
     };
   }, [setupSocket]);
 
+<<<<<<< HEAD
   // Toggle online status
+=======
+>>>>>>> 6fac3ecf179c8feeb22b400ae47a38a6054aafa2
   const toggleOnlineStatus = async () => {
     try {
       const newStatus = !isOnline;
       const response = await axios.post(
         "/api/user/driver/toggle-status",
         { isOnline: newStatus },
+<<<<<<< HEAD
         { headers: { 'Authorization': `Bearer ${tokenRef.current}` } }
+=======
+        {
+          headers: {
+            'Authorization': `Bearer ${tokenRef.current}`
+          }
+        }
+>>>>>>> 6fac3ecf179c8feeb22b400ae47a38a6054aafa2
       );
 
       if (!isMountedRef.current) return;
@@ -331,6 +500,10 @@ const DriverHome = () => {
         updateDriverLocation();
         const interval = setInterval(updateDriverLocation, 15000);
         setLocationIntervalId(interval);
+<<<<<<< HEAD
+=======
+
+>>>>>>> 6fac3ecf179c8feeb22b400ae47a38a6054aafa2
         if (socketRef.current?.connected) {
           socketRef.current.emit('driverOnline', userIdRef.current);
         }
@@ -339,21 +512,37 @@ const DriverHome = () => {
         setLocationIntervalId(null);
         setPendingRides([]);
         setAcceptedRides([]);
+<<<<<<< HEAD
+=======
+
+>>>>>>> 6fac3ecf179c8feeb22b400ae47a38a6054aafa2
         if (socketRef.current?.connected) {
           socketRef.current.emit('driverOffline', userIdRef.current);
         }
       }
     } catch (error) {
+<<<<<<< HEAD
       console.error("Status toggle error:", error);
       if (error.response?.status === 401) {
         navigate('/login');
       } else {
         toast.error(error.response?.data?.message || "Status update failed");
+=======
+      console.error("Error toggling status:", error);
+      if (error.response?.status === 401) {
+        toast.error("Session expired. Please login again.");
+        navigate('/login');
+      } else {
+        toast.error(error.response?.data?.message || "Failed to update status");
+>>>>>>> 6fac3ecf179c8feeb22b400ae47a38a6054aafa2
       }
     }
   };
 
+<<<<<<< HEAD
   // Fetch pending rides
+=======
+>>>>>>> 6fac3ecf179c8feeb22b400ae47a38a6054aafa2
   const fetchPendingRides = useCallback(async () => {
     if (!isOnline || !currentLocation) return;
     try {
@@ -361,6 +550,7 @@ const DriverHome = () => {
       const response = await fetchWithRetry("/api/user/driver/pending-rides");
       if (!isMountedRef.current) return;
 
+<<<<<<< HEAD
       const filteredRides = response.data.data
         .filter(ride => !acceptedRides.some(r => 
           r.userId === ride.userId && r.rideIndex === ride.rideIndex
@@ -381,6 +571,23 @@ const DriverHome = () => {
           navigate('/login');
         } else {
           toast.error("Failed to fetch pending rides");
+=======
+      const filteredRides = response.data.data.filter(ride =>
+        !acceptedRides.some(accRide => accRide.userId === ride.userId && accRide.rideIndex === ride.rideIndex)
+      ).map(ride => ({
+        ...ride,
+        uniqueKey: generateUniqueKey(ride.userId, ride.rideIndex)
+      }));
+      setPendingRides(filteredRides);
+    } catch (error) {
+      if (!isCancel(error) && isMountedRef.current) {
+        console.error("Error fetching pending rides:", error);
+        if (error.response?.status === 401) {
+          toast.error("Session expired. Please login again.");
+          navigate('/login');
+        } else {
+          toast.error(error.response?.data?.message || "Failed to fetch pending rides");
+>>>>>>> 6fac3ecf179c8feeb22b400ae47a38a6054aafa2
         }
       }
     } finally {
@@ -388,7 +595,10 @@ const DriverHome = () => {
     }
   }, [isOnline, acceptedRides, currentLocation, fetchWithRetry, navigate]);
 
+<<<<<<< HEAD
   // Fetch accepted rides with proper timestamp handling
+=======
+>>>>>>> 6fac3ecf179c8feeb22b400ae47a38a6054aafa2
   const fetchAcceptedRides = useCallback(async () => {
     if (!isOnline) return;
     try {
@@ -396,6 +606,7 @@ const DriverHome = () => {
       const response = await fetchWithRetry("/api/user/driver/accepted-rides");
       if (!isMountedRef.current) return;
 
+<<<<<<< HEAD
       setAcceptedRides(response.data.data.map(ride => {
         // Try multiple possible timestamp fields
         const acceptedTime = ride.accepted_at || ride.acceptedAt || 
@@ -419,6 +630,20 @@ const DriverHome = () => {
           navigate('/login');
         } else {
           toast.error("Failed to fetch accepted rides");
+=======
+      setAcceptedRides(response.data.data.map(ride => ({
+        ...ride,
+        uniqueKey: generateUniqueKey(ride.userId, ride.rideIndex)
+      })));
+    } catch (error) {
+      if (!isCancel(error) && isMountedRef.current) {
+        console.error("Error fetching accepted rides:", error);
+        if (error.response?.status === 401) {
+          toast.error("Session expired. Please login again.");
+          navigate('/login');
+        } else {
+          toast.error(error.response?.data?.message || "Failed to fetch accepted rides");
+>>>>>>> 6fac3ecf179c8feeb22b400ae47a38a6054aafa2
         }
       }
     } finally {
@@ -426,13 +651,22 @@ const DriverHome = () => {
     }
   }, [isOnline, fetchWithRetry, navigate]);
 
+<<<<<<< HEAD
   // Fetch rides when tab changes
+=======
+>>>>>>> 6fac3ecf179c8feeb22b400ae47a38a6054aafa2
   useEffect(() => {
     abortControllerRef.current = new AbortController();
     if (activeTab === 'pending' && isOnline && isMountedRef.current) {
       fetchPendingRides();
     }
+<<<<<<< HEAD
     return () => abortControllerRef.current.abort();
+=======
+    return () => {
+      abortControllerRef.current.abort();
+    };
+>>>>>>> 6fac3ecf179c8feeb22b400ae47a38a6054aafa2
   }, [activeTab, isOnline, currentLocation, fetchPendingRides]);
 
   useEffect(() => {
@@ -440,6 +674,7 @@ const DriverHome = () => {
     if (activeTab === 'accepted' && isOnline && isMountedRef.current) {
       fetchAcceptedRides();
     }
+<<<<<<< HEAD
     return () => abortControllerRef.current.abort();
   }, [activeTab, isOnline, fetchAcceptedRides]);
 
@@ -451,10 +686,28 @@ const DriverHome = () => {
         { userId, rideIndex },
         { headers: { 'Authorization': `Bearer ${tokenRef.current}` } }
       );
+=======
+    return () => {
+      abortControllerRef.current.abort();
+    };
+  }, [activeTab, isOnline, fetchAcceptedRides]);
+
+  const handleAcceptRide = async (userId, rideIndex) => {
+    try {
+      const response = await axios.post("/api/user/driver/accept-ride", {
+        userId,
+        rideIndex
+      }, {
+        headers: {
+          'Authorization': `Bearer ${tokenRef.current}`
+        }
+      });
+>>>>>>> 6fac3ecf179c8feeb22b400ae47a38a6054aafa2
 
       toast.success(response.data.message);
 
       setPendingRides(prev => {
+<<<<<<< HEAD
         const acceptedRide = prev.find(r => 
           r.userId === userId && r.rideIndex === rideIndex
         );
@@ -467,6 +720,15 @@ const DriverHome = () => {
             accepted_at: acceptedTime,
             uniqueKey: generateUniqueKey(userId, rideIndex),
             formattedAcceptedTime: formatDateTime(acceptedTime)
+=======
+        const acceptedRide = prev.find(r => r.userId === userId && r.rideIndex === rideIndex);
+        if (acceptedRide) {
+          setAcceptedRides(prevAccepted => [{ 
+            ...acceptedRide, 
+            status: "accepted", 
+            accepted_at: new Date(),
+            uniqueKey: generateUniqueKey(userId, rideIndex)
+>>>>>>> 6fac3ecf179c8feeb22b400ae47a38a6054aafa2
           }, ...prevAccepted]);
           return prev.filter(r => !(r.userId === userId && r.rideIndex === rideIndex));
         }
@@ -477,16 +739,26 @@ const DriverHome = () => {
         socketRef.current.emit('rideAccepted', { userId, rideIndex });
       }
     } catch (error) {
+<<<<<<< HEAD
       console.error("Accept ride error:", error);
       if (error.response?.status === 401) {
         navigate('/login');
       } else {
         toast.error("Failed to accept ride");
+=======
+      console.error("Error accepting ride:", error);
+      if (error.response?.status === 401) {
+        toast.error("Session expired. Please login again.");
+        navigate('/login');
+      } else {
+        toast.error(error.response?.data?.message || "Failed to accept ride");
+>>>>>>> 6fac3ecf179c8feeb22b400ae47a38a6054aafa2
         fetchPendingRides();
       }
     }
   };
 
+<<<<<<< HEAD
   // Complete ride handler
   const handleCompleteRide = async (customerId, rideIndex) => {
     try {
@@ -506,6 +778,28 @@ const DriverHome = () => {
         navigate('/login');
       } else {
         toast.error("Failed to complete ride");
+=======
+  const handleCompleteRide = async (customerId, rideIndex) => {
+    try {
+      const response = await axios.put("/api/user/ride/complete", {
+        customerId,
+        rideIndex
+      }, {
+        headers: {
+          'Authorization': `Bearer ${tokenRef.current}`
+        }
+      });
+
+      toast.success(response.data.message);
+      setAcceptedRides(prev => prev.filter(r => !(r.userId === customerId && r.rideIndex === rideIndex)));
+    } catch (error) {
+      console.error("Error completing ride:", error);
+      if (error.response?.status === 401) {
+        toast.error("Session expired. Please login again.");
+        navigate('/login');
+      } else {
+        toast.error(error.response?.data?.message || "Failed to complete ride");
+>>>>>>> 6fac3ecf179c8feeb22b400ae47a38a6054aafa2
         fetchAcceptedRides();
       }
     }
@@ -520,6 +814,7 @@ const DriverHome = () => {
     );
   }
 
+<<<<<<< HEAD
 return (
     <div className="driver-container">
       <ToastContainer position="top-right" autoClose={3000} />
@@ -536,11 +831,48 @@ return (
               alt="Profile"
               className="profile-img"
             />
+=======
+  return (
+    <div className="driver-container">
+      <ToastContainer 
+        position="top-right" 
+        autoClose={3000} 
+        hideProgressBar={false}
+        newestOnTop
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+      />
+
+      {/* Header */}
+      <header className="driver-header">
+        <div className="header-content">
+          <h1 className="app-name">RideShare Driver</h1>
+          <div className="profile-section" onClick={() => navigate("/profile")}>
+            <img
+              src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png"
+              alt="Profile"
+              className="profile-image"
+              loading="eager"
+            />
+            <span className="profile-name">Driver</span>
+>>>>>>> 6fac3ecf179c8feeb22b400ae47a38a6054aafa2
           </div>
         </div>
       </header>
 
+<<<<<<< HEAD
       <div className="status-controls">
+=======
+      {/* Status Bar */}
+      <div className="status-bar">
+        <div className="connection-status">
+          <span className={`status-dot ${socketStatus}`}></span>
+          WebSocket: {socketStatus}
+        </div>
+>>>>>>> 6fac3ecf179c8feeb22b400ae47a38a6054aafa2
         <div className={`status-indicator ${isOnline ? 'online' : 'offline'}`}>
           <span className="status-dot"></span>
           {isOnline ? 'Online' : 'Offline'}
@@ -550,6 +882,7 @@ return (
           onClick={toggleOnlineStatus}
           disabled={locationError && !currentLocation}
         >
+<<<<<<< HEAD
           {isOnline ? (
             <>
               <span className="material-symbols-outlined">toggle_off</span>
@@ -568,11 +901,23 @@ return (
         {currentLocation ? (
           <>
             <span className="material-symbols-outlined location-icon">location_on</span>
+=======
+          {isOnline ? 'Go Offline' : 'Go Online'}
+        </button>
+      </div>
+
+      {/* Current Location */}
+      <div className="location-info">
+        {currentLocation ? (
+          <>
+            <span className="location-icon">📍</span>
+>>>>>>> 6fac3ecf179c8feeb22b400ae47a38a6054aafa2
             <span className="location-text">
               {currentLocation.lat.toFixed(4)}, {currentLocation.lng.toFixed(4)}
             </span>
           </>
         ) : locationError ? (
+<<<<<<< HEAD
           <span className="location-error">
             <span className="material-symbols-outlined">warning</span>
             {locationError}
@@ -585,6 +930,15 @@ return (
         )}
       </div>
 
+=======
+          <span className="location-error">⚠️ {locationError}</span>
+        ) : (
+          <span className="location-loading">Detecting location...</span>
+        )}
+      </div>
+
+      {/* Tabs */}
+>>>>>>> 6fac3ecf179c8feeb22b400ae47a38a6054aafa2
       <div className="tabs">
         <button
           className={`tab-btn ${activeTab === 'pending' ? 'active' : ''}`}
@@ -600,18 +954,26 @@ return (
         </button>
       </div>
 
+<<<<<<< HEAD
       <div className="rides-container">
         {isFetchingRides ? (
           <div className="loading">
             <div className="loading-spinner"></div>
             <p>Loading rides...</p>
           </div>
+=======
+      {/* Rides List */}
+      <div className="rides-container">
+        {isFetchingRides ? (
+          <div className="loading">Loading rides...</div>
+>>>>>>> 6fac3ecf179c8feeb22b400ae47a38a6054aafa2
         ) : activeTab === 'pending' ? (
           pendingRides.length > 0 ? (
             <ul className="rides-list">
               {pendingRides.map((ride) => (
                 <li key={ride.uniqueKey} className="ride-card">
                   <div className="ride-info">
+<<<<<<< HEAD
                     <h3>
                       <span className="material-symbols-outlined">my_location</span>
                       Ride from {ride.pickup_location.address}
@@ -659,20 +1021,37 @@ return (
                       </button>
                     </div>
                   </div>
+=======
+                    <h3>Ride from {ride.pickup_location.address}</h3>
+                    <p>Distance: {ride.distance}</p>
+                    <p>Fare: ${ride.fare?.toFixed(2) || 'N/A'}</p>
+                  </div>
+                  <button
+                    className="accept-btn"
+                    onClick={() => handleAcceptRide(ride.userId, ride.rideIndex)}
+                  >
+                    Accept Ride
+                  </button>
+>>>>>>> 6fac3ecf179c8feeb22b400ae47a38a6054aafa2
                 </li>
               ))}
             </ul>
           ) : (
+<<<<<<< HEAD
             <div className="no-rides">
               <span className="material-symbols-outlined">directions_car</span>
               <p>No pending rides available</p>
             </div>
+=======
+            <div className="no-rides">No pending rides available</div>
+>>>>>>> 6fac3ecf179c8feeb22b400ae47a38a6054aafa2
           )
         ) : acceptedRides.length > 0 ? (
           <ul className="rides-list">
             {acceptedRides.map((ride) => (
               <li key={ride.uniqueKey} className="ride-card">
                 <div className="ride-info">
+<<<<<<< HEAD
                   <h3>
                     <span className="material-symbols-outlined">my_location</span>
                     Ride to {ride.dropoff_location.address}
@@ -728,14 +1107,31 @@ return (
                     </button>
                   </div>
                 </div>
+=======
+                  <h3>Ride to {ride.dropoff_location.address}</h3>
+                  <p>Pickup: {ride.pickup_location.address}</p>
+                  <p>Status: {ride.status}</p>
+                  <p>Accepted: {new Date(ride.accepted_at).toLocaleTimeString()}</p>
+                </div>
+                <button
+                  className="complete-btn"
+                  onClick={() => handleCompleteRide(ride.userId, ride.rideIndex)}
+                >
+                  Complete Ride
+                </button>
+>>>>>>> 6fac3ecf179c8feeb22b400ae47a38a6054aafa2
               </li>
             ))}
           </ul>
         ) : (
+<<<<<<< HEAD
           <div className="no-rides">
             <span className="material-symbols-outlined">directions_car</span>
             <p>No accepted rides</p>
           </div>
+=======
+          <div className="no-rides">No accepted rides</div>
+>>>>>>> 6fac3ecf179c8feeb22b400ae47a38a6054aafa2
         )}
       </div>
     </div>

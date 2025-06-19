@@ -1,7 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "../styles/styles.css";
+<<<<<<< HEAD
 import Chatbot from "./chatbot";
+=======
+>>>>>>> 6fac3ecf179c8feeb22b400ae47a38a6054aafa2
 
 function Home() {
   const navigate = useNavigate();
@@ -45,7 +48,11 @@ function Home() {
             </div>
           </div>
           <div 
+<<<<<<< HEAD
             className="mobile-menu-btn"
+=======
+            className="mobile-menu-btn" 
+>>>>>>> 6fac3ecf179c8feeb22b400ae47a38a6054aafa2
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
           >
             <span className="material-symbols-outlined">
@@ -58,6 +65,7 @@ function Home() {
       {/* Main Content */}
       <div className="main-content">
         {/* Main Hero Section */}
+<<<<<<< HEAD
         <section className="main-hero">
           <div className="hero-content">
             <div className="hero-text">
@@ -86,23 +94,64 @@ function Home() {
               <img
                 src="https://www.uber-assets.com/image/upload/f_auto,q_auto:eco,c_fill,w_767,h_767/v1684855112/assets/96/4dd3d1-94e7-481e-b28c-08d59353b9e0/original/earner-illustra.png"
                 alt="Driver earning with Uber"
+=======
+        <section className="main-container">
+          <div className="main-left">
+            <h1>Go anywhere with <br /> Uber</h1>
+            <p className="subtitle">Request a ride, hop in, and go</p>
+            <div className="main-btns">
+              <button className="ride-btn">Ride with Uber</button>
+              <button className="drive-btn">Drive with Uber</button>
+            </div>
+          </div>
+          <div className="main-right">
+            <img 
+              src="https://www.uber-assets.com/image/upload/f_auto,q_auto:eco,c_fill,w_767,h_960/v1695226426/assets/b9/71b0b4-b082-4d67-9615-3ea8a60e6e2a/original/header-dual.png" 
+              alt="Uber app screenshot" 
+              className="hero-image"
+              loading="lazy"
+            />
+          </div>
+        </section>
+
+        {/* Features Section */}
+        <section className="feature-section">
+          <div className="feature-container started-container">
+            <div className="started-left">
+              <img 
+                src="https://www.uber-assets.com/image/upload/f_auto,q_auto:eco,c_fill,w_767,h_767/v1684855112/assets/96/4dd3d1-94e7-481e-b28c-08d59353b9e0/original/earner-illustra.png" 
+                alt="Driver earning with Uber" 
+>>>>>>> 6fac3ecf179c8feeb22b400ae47a38a6054aafa2
                 className="feature-image"
                 loading="lazy"
               />
             </div>
+<<<<<<< HEAD
             <div className="feature-text">
               <h2>Drive when you want, make what you need</h2>
               <p>Make money on your schedule with deliveries or rides—or both. You can use your own car or choose a rental through Uber.</p>
               <div className="feature-buttons">
+=======
+            <div className="started-right">
+              <h2>Drive when you <br /> want, make what <br /> you need</h2>
+              <p>Make money on your schedule with deliveries or rides—or both. You can use your own car or choose a rental through Uber.</p>
+              <div className="started-btns">
+>>>>>>> 6fac3ecf179c8feeb22b400ae47a38a6054aafa2
                 <button className="cta-btn">Get Started</button>
                 <p onClick={() => navigate("/login")} className="sign-in-link">Already have an account? Sign in</p>
               </div>
             </div>
           </div>
 
+<<<<<<< HEAD
           <div className="feature-card reverse">
             <div className="feature-text">
               <h2>Always the ride you want</h2>
+=======
+          <div className="feature-container ride-wrap">
+            <div className="ride-left">
+              <h2>Always the ride <br />you want</h2>
+>>>>>>> 6fac3ecf179c8feeb22b400ae47a38a6054aafa2
               <p className="subtitle">Request a ride, hop in, and go</p>
               <div className="ride-form">
                 <div className="location-wrap">
@@ -124,45 +173,79 @@ function Home() {
                 <button className="prices-btn">See prices</button>
               </div>
             </div>
+<<<<<<< HEAD
             <div className="feature-image-container">
               <img
                 src="https://www.uber-assets.com/image/upload/f_auto,q_auto:eco,c_fill,w_767,h_767/v1684887342/assets/4b/a6cba6-46dc-4084-960c-60dfef262936/original/rideshare-square.png"
                 alt="Ride with Uber"
+=======
+            <div className="ride-right">
+              <img 
+                src="https://www.uber-assets.com/image/upload/f_auto,q_auto:eco,c_fill,w_767,h_767/v1684887342/assets/4b/a6cba6-46dc-4084-960c-60dfef262936/original/rideshare-square.png" 
+                alt="Ride with Uber" 
+>>>>>>> 6fac3ecf179c8feeb22b400ae47a38a6054aafa2
                 className="feature-image"
                 loading="lazy"
               />
             </div>
           </div>
 
+<<<<<<< HEAD
           <div className="feature-card">
             <div className="feature-image-container">
               <img
                 src="https://www.uber-assets.com/image/upload/f_auto,q_auto:eco,c_fill,w_767,h_767/v1684887108/assets/76/baf1ea-385a-408c-846b-59211086196c/original/u4b-square.png"
                 alt="Uber for Business"
+=======
+          <div className="feature-container started-container reverse">
+            <div className="started-left">
+              <img 
+                src="https://www.uber-assets.com/image/upload/f_auto,q_auto:eco,c_fill,w_767,h_767/v1684887108/assets/76/baf1ea-385a-408c-846b-59211086196c/original/u4b-square.png" 
+                alt="Uber for Business" 
+>>>>>>> 6fac3ecf179c8feeb22b400ae47a38a6054aafa2
                 className="feature-image"
                 loading="lazy"
               />
             </div>
+<<<<<<< HEAD
             <div className="feature-text">
               <h2>The Uber you know, reimagined for business</h2>
               <p>Uber for Business is a platform for managing global rides and meals, and local deliveries, for companies of any size.</p>
               <div className="feature-buttons">
+=======
+            <div className="started-right">
+              <h2>The Uber you <br /> know, reimagined <br /> for business</h2>
+              <p>Uber for Business is a platform for managing global rides and meals, and local deliveries, for companies of any size.</p>
+              <div className="started-btns">
+>>>>>>> 6fac3ecf179c8feeb22b400ae47a38a6054aafa2
                 <button className="cta-btn">Get Started</button>
                 <p className="secondary-link">Check out our solutions</p>
               </div>
             </div>
           </div>
 
+<<<<<<< HEAD
           <div className="feature-card reverse">
             <div className="feature-text">
+=======
+          <div className="feature-container ride-wrap">
+            <div className="ride-left">
+>>>>>>> 6fac3ecf179c8feeb22b400ae47a38a6054aafa2
               <h2>Make money by renting out your car</h2>
               <p className="subtitle">Connect with thousands of drivers and earn more per week with Uber's free fleet management tools.</p>
               <button className="prices-btn">See prices</button>
             </div>
+<<<<<<< HEAD
             <div className="feature-image-container">
               <img
                 src="https://www.uber-assets.com/image/upload/f_auto,q_auto:eco,c_fill,w_767,h_767/v1696243819/assets/18/34e6fd-33e3-4c95-ad7a-f484a8c812d7/original/fleet-management.jpg"
                 alt="Rent your car with Uber"
+=======
+            <div className="ride-right">
+              <img 
+                src="https://www.uber-assets.com/image/upload/f_auto,q_auto:eco,c_fill,w_767,h_767/v1696243819/assets/18/34e6fd-33e3-4c95-ad7a-f484a8c812d7/original/fleet-management.jpg" 
+                alt="Rent your car with Uber" 
+>>>>>>> 6fac3ecf179c8feeb22b400ae47a38a6054aafa2
                 className="feature-image"
                 loading="lazy"
               />
@@ -171,9 +254,15 @@ function Home() {
         </section>
 
         {/* Ride Options Section */}
+<<<<<<< HEAD
         <section className="ride-options-section">
           <h2>Ride with Uber</h2>
           <div className="options-grid">
+=======
+        <section className="uber-ride-wrap">
+          <h2>Ride with Uber</h2>
+          <div className="auto-moto-wrap">
+>>>>>>> 6fac3ecf179c8feeb22b400ae47a38a6054aafa2
             {[
               {
                 title: "Uber Auto",
@@ -196,9 +285,15 @@ function Home() {
                 img: "https://www.uber-assets.com/image/upload/f_auto,q_auto:eco,c_fill,w_116,h_116/v1649914597/assets/f7/7f583f-447a-4cf7-8da6-6ad254f0a66b/original/Intercity-150X150p4x.png"
               }
             ].map((veh, i) => (
+<<<<<<< HEAD
               <div className="option-card" key={i}>
                 <img src={veh.img} alt={veh.title} className="vehicle-img" loading="lazy" />
                 <div className="option-details">
+=======
+              <div className="veh-container" key={i}>
+                <img src={veh.img} alt={veh.title} className="vehicle-img" loading="lazy" />
+                <div className="ride-details">
+>>>>>>> 6fac3ecf179c8feeb22b400ae47a38a6054aafa2
                   <h3>{veh.title}</h3>
                   <div className="det-icon">
                     <p>{veh.text}</p>
@@ -242,19 +337,29 @@ function Home() {
             </div>
           ))}
         </div>
+<<<<<<< HEAD
         <div className="footer-bottom">
+=======
+        <div className="copyright">
+          <p>© 2023 Uber Technologies Inc. | Cloned by Abhinav Singh</p>
+>>>>>>> 6fac3ecf179c8feeb22b400ae47a38a6054aafa2
           <div className="social-links">
             <span className="material-symbols-outlined">facebook</span>
             <span className="material-symbols-outlined">twitter</span>
             <span className="material-symbols-outlined">instagram</span>
             <span className="material-symbols-outlined">linkedin</span>
           </div>
+<<<<<<< HEAD
           <p>© 2023 Uber Technologies Inc. | Cloned by Abhinav Singh</p>
         </div>
       </footer>
 
       {/* Chatbot Component */}
       <Chatbot />
+=======
+        </div>
+      </footer>
+>>>>>>> 6fac3ecf179c8feeb22b400ae47a38a6054aafa2
     </div>
   );
 }
